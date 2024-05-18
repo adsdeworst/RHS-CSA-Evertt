@@ -8,13 +8,15 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 public class Window extends JFrame implements KeyListener {
+
     // Singleton...
-	private static Window instance = null;
-	protected static synchronized Window get()
-    {
-        if (instance == null)
+    private static Window instance = null;
+
+    protected static synchronized Window get() {
+        if (instance == null) {
             instance = new Window();
-  
+        }
+
         return instance;
     }
 
@@ -32,7 +34,7 @@ public class Window extends JFrame implements KeyListener {
         setMinimumSize(new Dimension(DEFAULT_WINDOW_WIDTH / 2, DEFAULT_WINDOW_HEIGHT / 2));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        addKeyListener(this);     
+        addKeyListener(this);
     }
 
     protected static boolean create() {
@@ -46,10 +48,12 @@ public class Window extends JFrame implements KeyListener {
     }
 
     // Key press support...
-    public void keyPressed(KeyEvent e) {    
+    public void keyPressed(KeyEvent e) {
     }
-    public void keyReleased(KeyEvent e) {    
+
+    public void keyReleased(KeyEvent e) {
     }
-    public void keyTyped(KeyEvent e) {    
+
+    public void keyTyped(KeyEvent e) {
     }
 }

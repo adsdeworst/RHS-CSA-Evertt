@@ -1,12 +1,12 @@
 package game;
 
+import game.ElevatorController.Direction;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
-import game.ElevatorController.Direction;
-
 public class Elevator extends GameObject {
+
     // Consts...
     public static final double TRAVEL_VELOCITY = 2.0;       // Units are floors per second
     public static final double DOOR_OPEN_VELOCITY = 2.0;    // Fully open/close in 1/DOOR_OPEN_VELOCITY seconds
@@ -39,44 +39,56 @@ public class Elevator extends GameObject {
     // Accessors...
     public Vec2 getPos() {
         Vec2 posLL = new Vec2(World.ELEVATOR_LEFT_RIGHT_SPACE + (World.ELEVATOR_DOORS_HALFDIMS.x * 2 + World.ELEVATOR_SPACING) * elevatorIdx,
-                              World.FLOOR_HEIGHT * currentFloor);
+                World.FLOOR_HEIGHT * currentFloor);
         return Vec2.add(posLL, getHalfDims());
     }
+
     private Vec2 getFramePos(int floorIdx) {
         Vec2 posLL = new Vec2(World.ELEVATOR_LEFT_RIGHT_SPACE + (World.ELEVATOR_DOORS_HALFDIMS.x * 2 + World.ELEVATOR_SPACING) * elevatorIdx,
-                              World.FLOOR_HEIGHT * floorIdx);
+                World.FLOOR_HEIGHT * floorIdx);
         return Vec2.add(posLL, getHalfDims());
     }
+
     public Vec2 getHalfDims() {
         return World.ELEVATOR_DOORS_HALFDIMS;
     }
+
     public int getIndex() {
         return elevatorIdx;
     }
+
     protected double getCurrentFloor() {
         return currentFloor;
     }
+
     protected int getTargetFloor() {
         return targetFloor;
     }
+
     protected void setTargetFloor(int targetFloor) {
         this.targetFloor = targetFloor;
     }
+
     protected ElevatorController.Direction getTravelDirection() {
         return travelDirection;
     }
+
     protected void setTravelDirection(ElevatorController.Direction direction) {
         travelDirection = direction;
     }
+
     protected double getDoorClosedPercent() {
         return doorClosePerc;
     }
+
     protected boolean getAreDoorsOpen() {
         return (doorClosePerc == 0.0);
     }
+
     protected boolean getAreDoorsClosed() {
         return (doorClosePerc == 1.0);
-    }    
+    }
+
     protected int getNumberOfZombiesOnElevator() {
         int count = 0;
         ArrayList<Zombie> zombies = Simulation.get(playerIdx).getZombies();
@@ -85,14 +97,16 @@ public class Elevator extends GameObject {
         }
         return count;
     }
+
     protected boolean canAcceptNewZombiePassenger(Zombie zombie) {
-        return getAreDoorsOpen() && 
-               (getCurrentFloor() == (double)zombie.getCurrentFloor()) && 
-               (getNumberOfZombiesOnElevator() < MAX_CAPACITY) &&
-               ((travelDirection == ElevatorController.Direction.None) || 
-                ((travelDirection == ElevatorController.Direction.Up) && (zombie.getTargetFloor() > zombie.getCurrentFloor())) ||
-                ((travelDirection == ElevatorController.Direction.Down) && (zombie.getTargetFloor() < zombie.getCurrentFloor())));
+        return getAreDoorsOpen()
+                && (getCurrentFloor() == (double) zombie.getCurrentFloor())
+                && (getNumberOfZombiesOnElevator() < MAX_CAPACITY)
+                && ((travelDirection == ElevatorController.Direction.None)
+                || ((travelDirection == ElevatorController.Direction.Up) && (zombie.getTargetFloor() > zombie.getCurrentFloor()))
+                || ((travelDirection == ElevatorController.Direction.Down) && (zombie.getTargetFloor() < zombie.getCurrentFloor())));
     }
+
     protected boolean requestFloor(int floorIdx) {
         if ((floorIdx < 0) || (floorIdx >= floorRequests.length)) {
             return false;
@@ -103,7 +117,7 @@ public class Elevator extends GameObject {
 
         // Track it...
         floorRequests[floorIdx] = true;
-        
+
         // Event...
         ElevatorController controller = Game.get().getElevatorController(playerIdx);
         if (controller != null) {
@@ -114,6 +128,7 @@ public class Elevator extends GameObject {
 
         return true;
     }
+
     protected void clearRequestForFloor(int floorIdx) {
         if ((floorIdx < 0) || (floorIdx >= floorRequests.length)) {
             return;
@@ -133,14 +148,16 @@ public class Elevator extends GameObject {
             Game.get().setActivePlayerIdx(0);
         }
     }
+
     protected boolean hasRequestForFloor(int floorIdx) {
         if ((floorIdx < 0) || (floorIdx >= floorRequests.length)) {
             return false;
         }
         return floorRequests[floorIdx];
     }
+
     protected boolean isIdle() {
-        return (doorClosePerc == 0.0) && !Simulation.get(playerIdx).anyZombiesGettingOnElevator(this) && (currentFloor == (double)targetFloor);
+        return (doorClosePerc == 0.0) && !Simulation.get(playerIdx).anyZombiesGettingOnElevator(this) && (currentFloor == (double) targetFloor);
     }
 
     // Update...
@@ -149,38 +166,36 @@ public class Elevator extends GameObject {
         super.update(deltaTime);
 
         // Update floor...
-        if (currentFloor != (double)targetFloor) {
+        if (currentFloor != (double) targetFloor) {
             // Only move when the doors are closed...
             if (doorClosePerc == 1.0) {
                 double prevFloor = currentFloor;
-                currentFloor = ((double)targetFloor < currentFloor) ? Math.max(currentFloor - deltaTime * TRAVEL_VELOCITY, targetFloor) : Math.min(currentFloor + deltaTime * TRAVEL_VELOCITY, targetFloor);
+                currentFloor = ((double) targetFloor < currentFloor) ? Math.max(currentFloor - deltaTime * TRAVEL_VELOCITY, targetFloor) : Math.min(currentFloor + deltaTime * TRAVEL_VELOCITY, targetFloor);
 
                 // There's a cost for motion...
-                if ((deltaTime > 0.0) && ((int)currentFloor != (int)prevFloor)) {
+                if ((deltaTime > 0.0) && ((int) currentFloor != (int) prevFloor)) {
                     Game.get().awardPoints(playerIdx, Game.POINTS_ELEVATOR_FLOOR);
                 }
 
                 // If we get there, clear the request...
                 if (currentFloor == targetFloor) {
-                    clearRequestForFloor((int)currentFloor);
+                    clearRequestForFloor((int) currentFloor);
                 }
-            }
-            else {
+            } else {
                 doorClosePerc = Math.min(doorClosePerc + DOOR_OPEN_VELOCITY * deltaTime, 1.0f);
 
                 // Check for closed, if so clear the floor reqest...
                 if (doorClosePerc == 1.0) {
                     // Remove any "outside" requests...
                     if ((travelDirection == ElevatorController.Direction.Up) || (travelDirection == ElevatorController.Direction.None)) {
-                        Simulation.get(playerIdx).remElevatorRequest((int)currentFloor, Direction.Up);
+                        Simulation.get(playerIdx).remElevatorRequest((int) currentFloor, Direction.Up);
                     }
                     if ((travelDirection == ElevatorController.Direction.Down) || (travelDirection == ElevatorController.Direction.None)) {
-                        Simulation.get(playerIdx).remElevatorRequest((int)currentFloor, Direction.Down);
+                        Simulation.get(playerIdx).remElevatorRequest((int) currentFloor, Direction.Down);
                     }
                 }
             }
-        }
-        else {
+        } else {
             // Make sure the doors are open...
             if (doorClosePerc != 0.0) {
                 doorClosePerc = Math.max(doorClosePerc - DOOR_OPEN_VELOCITY * deltaTime, 0.0f);
@@ -191,7 +206,7 @@ public class Elevator extends GameObject {
                     ElevatorController controller = Game.get().getElevatorController(playerIdx);
                     if (controller != null) {
                         Game.get().setActivePlayerIdx(playerIdx);
-                        controller.onElevatorArrivedAtFloor(elevatorIdx, (int)currentFloor, travelDirection);
+                        controller.onElevatorArrivedAtFloor(elevatorIdx, (int) currentFloor, travelDirection);
                         Game.get().setActivePlayerIdx(0);
                     }
                 }
@@ -204,28 +219,29 @@ public class Elevator extends GameObject {
         // Draw all the doors (closed or otherwise)...
         int floorCount = Game.get().getFloorCount();
         Vec2 halfDims = getHalfDims();
-		for (int i = 0; i < floorCount; i++) {
+        for (int i = 0; i < floorCount; i++) {
             // Background...
             Vec2 posFrame = getFramePos(i);
             Draw.drawRect(playerIdx, g, posFrame, halfDims, 1, Color.DARK_GRAY, Color.BLACK, 0.02, 0.05);
         }
-	}    
+    }
+
     protected void drawDoors(Graphics2D g) {
         // Draw all the doors (closed or otherwise)...
         int floorCount = Game.get().getFloorCount();
         Vec2 halfDims = getHalfDims();
-		for (int i = 0; i < floorCount; i++) {
+        for (int i = 0; i < floorCount; i++) {
             // Figure out the floor dims for this floor (may be open)...
             Vec2 posFrame = getFramePos(i);
-            double thisFloorDoorClosePerc = (i == (int)Math.round(currentFloor)) ? doorClosePerc : 1;
+            double thisFloorDoorClosePerc = (i == (int) Math.round(currentFloor)) ? doorClosePerc : 1;
             Vec2 halfDimsDoor = new Vec2((halfDims.x * 0.5) * thisFloorDoorClosePerc, halfDims.y);
 
             // Doors...
             double guardSpace = 0.01;
             Vec2 posFrameLeft = new Vec2(posFrame.x - halfDimsDoor.x - (halfDims.x * 0.5 - halfDimsDoor.x) * 2 + guardSpace, posFrame.y);
             Vec2 posFrameRight = new Vec2(posFrame.x + halfDimsDoor.x + (halfDims.x * 0.5 - halfDimsDoor.x) * 2 - guardSpace, posFrame.y);
-            Draw.drawRect(playerIdx, g, posFrameLeft, halfDimsDoor, 1, new Color(191,193,194), Color.BLACK, 0.01, 0.0);
-            Draw.drawRect(playerIdx, g, posFrameRight, halfDimsDoor, 1, new Color(191,193,194), Color.BLACK, 0.01, 0.0);
+            Draw.drawRect(playerIdx, g, posFrameLeft, halfDimsDoor, 1, new Color(191, 193, 194), Color.BLACK, 0.01, 0.0);
+            Draw.drawRect(playerIdx, g, posFrameRight, halfDimsDoor, 1, new Color(191, 193, 194), Color.BLACK, 0.01, 0.0);
         }
-	}
+    }
 }

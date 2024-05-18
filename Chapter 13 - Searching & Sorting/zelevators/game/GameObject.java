@@ -3,10 +3,11 @@ package game;
 import java.awt.Graphics2D;
 
 public class GameObject {
-	// Member variables...
+    // Member variables...
+
     protected int playerIdx = -1;
     protected Vec2 pos = null;
-	protected double timeTillDeath = 0;
+    protected double timeTillDeath = 0;
     protected double timeSinceBorn = 0;
 
     // Accessors...
@@ -18,7 +19,7 @@ public class GameObject {
         return playerIdx;
     }
 
-	// Member functions (methods)...
+    // Member functions (methods)...
     protected GameObject(int playerIdx) {
         this.playerIdx = playerIdx;
     }
@@ -30,9 +31,9 @@ public class GameObject {
         return (timeTillDeath >= 1);
     }
 
-	public boolean isDying() {
-		return (this.timeTillDeath > 0);
-	}    
+    public boolean isDying() {
+        return (this.timeTillDeath > 0);
+    }
 
     protected void update(double deltaTime) {
         // Timers...
@@ -48,8 +49,8 @@ public class GameObject {
     }
 
     protected double calcDrawScale() {
-		return Math.max(1.0 - this.timeTillDeath, 0.001) * Math.min(timeSinceBorn * 2, 1);
-	}
+        return Math.max(1.0 - this.timeTillDeath, 0.001) * Math.min(timeSinceBorn * 2, 1);
+    }
 
     protected void drawShadow(Graphics2D g) {
     }

@@ -1,6 +1,7 @@
 package game;
 
 public class GameConfig {
+
     // Data
     public int gameTimeInSeconds = 120;
     public int floorCount = 8;
@@ -11,6 +12,7 @@ public class GameConfig {
     // Constructor(s)
     public GameConfig() {
     }
+
     public GameConfig(int gameTimeInSeconds, int floorCount, int elevatorCount, double zombieSpawnPeriod) {
         this.gameTimeInSeconds = gameTimeInSeconds;
         this.floorCount = floorCount;

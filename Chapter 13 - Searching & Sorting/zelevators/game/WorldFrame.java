@@ -17,12 +17,15 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class WorldFrame extends JPanel implements ActionListener, MouseListener {
+
     // Singleton...
-	private static WorldFrame instances = null;
-	protected static synchronized WorldFrame get() {
-        if (instances == null)
+    private static WorldFrame instances = null;
+
+    protected static synchronized WorldFrame get() {
+        if (instances == null) {
             instances = new WorldFrame();
-  
+        }
+
         return instances;
     }
 
@@ -37,6 +40,7 @@ public class WorldFrame extends JPanel implements ActionListener, MouseListener 
     public int getFrameWidth() {
         return getWidth();
     }
+
     public int getFrameHeight() {
         return getHeight();
     }
@@ -82,23 +86,26 @@ public class WorldFrame extends JPanel implements ActionListener, MouseListener 
     // Mouse events...
     public void mousePressed(MouseEvent event) {
     }
+
     public void mouseReleased(MouseEvent event) {
     }
+
     public void mouseEntered(MouseEvent event) {
     }
+
     public void mouseExited(MouseEvent event) {
     }
+
     public void mouseClicked(MouseEvent event) {
         // Double click restarts it...
         if (event.getClickCount() == 2 && !event.isConsumed()) {
             Game.get().onLevelSetup();
-        }
-        else if ((event.getClickCount() == 1) && Game.get().isGameActive()) {
+        } else if ((event.getClickCount() == 1) && Game.get().isGameActive()) {
             // Pause/unpause the game...
             Game.get().setGamePause(!Game.get().isGamePaused());
         }
     }
-    
+
     // Draw functions...
     private void drawFrame(Graphics2D g) {
         // Wait till we're actually inialized...
@@ -136,7 +143,8 @@ public class WorldFrame extends JPanel implements ActionListener, MouseListener 
         // Let the game do its drawing...
         Game.get().Draw(g);
     }
+
     public void paint(Graphics g) {
-        drawFrame((Graphics2D)g);
+        drawFrame((Graphics2D) g);
     }
 }
